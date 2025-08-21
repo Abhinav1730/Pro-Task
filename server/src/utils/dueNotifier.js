@@ -1,4 +1,4 @@
-import tasks from "../models/taskModel";
+import tasks from "../models/taskModel.js";
 
 /**
  * Checks tasks for due dates and notifies assigned users in real-time via Socket.IO.
