@@ -12,8 +12,8 @@ router.post("/", auth, async (req, res, next) => {
     const project = await projects.create({
       name,
       description,
-      owner: req.existedUser._id,
-      members: [req.existedUser._id, ...members],
+      owner: req.user._id,
+      members: [req.user._id, ...members],
     });
     res.status(201).json(project);
   } catch (error) {
