@@ -1,7 +1,7 @@
 import express from "express";
 import { auth } from "../middleware/authMiddleware.js";
-import projects from "../models/projectModels.js";
-import user from "../models/userModel.js";
+import Project from "../models/projectModels.js";
+import User from "../models/userModel.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/invite/:projectId", auth, async (req, res, next) => {
   try {
     const { email } = req.body;
-    const project = await projects.findById(req.params.projectId);
+    const project = await Project.findById(req.params.projectId);
 
     if (!project) return res.status(404).json({ message: "Project not found" });
 
@@ -18,7 +18,7 @@ router.post("/invite/:projectId", auth, async (req, res, next) => {
       return res.status(403).json({ message: "Only owner can invite members" });
     }
 
-    const user = await user.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (project.members.includes(user._id)) {
@@ -37,7 +37,7 @@ router.post("/invite/:projectId", auth, async (req, res, next) => {
 // gathering all collaboraters of the project
 router.get("/:projectId", auth, async (req, res, next) => {
   try {
-    const project = await projects
+    const project = await Project
       .findById(req.params.projectId)
       .populate("members", "name email");
 
@@ -58,7 +58,7 @@ router.get("/:projectId", auth, async (req, res, next) => {
 // remove collaborator from projects
 router.delete("/:projectId/:userId", auth, async (req, res, next) => {
   try {
-    const project = await projects.findById(req.params.projectId);
+    const project = await Project.findById(req.params.projectId);
 
     if (!project) return res.status(404).json({ message: "Project not found" });
 

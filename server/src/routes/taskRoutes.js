@@ -1,7 +1,7 @@
 import express from "express";
 import { auth } from "../middleware/authMiddleware.js";
-import projects from "../models/projectModels.js";
-import tasks from "../models/taskModel.js";
+import Project from "../models/projectModels.js";
+import Task from "../models/taskModel.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/:projectId", auth, async (req, res, next) => {
   try {
     const { title, description, status = "To be Done", dueDate } = req.body;
-    const project = await projects.findById(req.params.projectId);
+    const project = await Project.findById(req.params.projectId);
 
     if (!project) return res.status(404).json({ message: "Project not found" });
 
@@ -20,7 +20,7 @@ router.post("/:projectId", auth, async (req, res, next) => {
     if (!isMember)
       return res.status(403).json({ message: "Forbidden Request" });
 
-    const task = await tasks.create({
+    const task = await Task.create({
       title,
       description,
       status,
@@ -39,7 +39,7 @@ router.post("/:projectId", auth, async (req, res, next) => {
 // get all tasks for a project
 router.get("/:projectId", auth, async (req, res, next) => {
   try {
-    const project = await projects.findById(req.params.projectId);
+    const project = await Project.findById(req.params.projectId);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     const isMember =
@@ -47,7 +47,7 @@ router.get("/:projectId", auth, async (req, res, next) => {
       project.members.includes(req.user._id);
     if (!isMember) return res.status(403).json({ message: "Forbidden" });
 
-    const tasks = await tasks.find({ project: project._id }).sort("-createdAt");
+    const tasks = await Task.find({ project: project._id }).sort("-createdAt");
     res.json(tasks);
   } catch (e) {
     next(e);
@@ -57,11 +57,11 @@ router.get("/:projectId", auth, async (req, res, next) => {
 // update task
 router.put("/:taskId", auth, async (req, res, next) => {
   try {
-    const task = await tasks.findById(req.params.taskId);
+    const task = await Task.findById(req.params.taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
     // check if user is project member
-    const project = await projects.findById(task.project);
+    const project = await Project.findById(task.project);
     const isMember =
       project.owner.equals(req.user._id) ||
       project.members.includes(req.user._id);
@@ -79,10 +79,10 @@ router.put("/:taskId", auth, async (req, res, next) => {
 // Delete task
 router.delete("/:taskId", auth, async (req, res, next) => {
   try {
-    const task = await tasks.findById(req.params.taskId);
+    const task = await Task.findById(req.params.taskId);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    const project = await projects.findById(task.project);
+    const project = await Project.findById(task.project);
     if (!project) return res.status(404).json({ message: "Project not found" });
 
     const isMember =

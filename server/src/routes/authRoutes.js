@@ -4,7 +4,7 @@ import express, { json } from "express";
 import { validationResult } from "express-validator";
 import { registerRules, loginRules } from "../utils/validator.js";
 import { auth } from "../middleware/authMiddleware.js";
-import user from "../models/userModel.js";
+import User from "../models/userModel.js";
 
 const router = express.Router();
 
@@ -16,12 +16,12 @@ router.post("/register", registerRules, async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
 
     const { name, email, password } = req.body;
-    const existedUser = await user.findOne({ email });
+    const existedUser = await User.findOne({ email });
     if (existedUser)
       return res.status(400).json({ message: "User Already Exists" });
 
     const hash = await bcrypt.hash(password, 10);
-    const newUser = await user.create({ name, email, password: hash });
+    const newUser = await User.create({ name, email, password: hash });
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "2d",
     });
@@ -32,14 +32,14 @@ router.post("/register", registerRules, async (req, res, next) => {
 });
 
 // For Login
-router.post("login", loginRules, async (req, res, next) => {
+router.post("/login", loginRules, async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
 
     const { email, password } = req.body;
-    const existedUser = await user.findOne({ email });
+    const existedUser = await User.findOne({ email });
     if (!existedUser)
       return res.status(400).json({ message: "Invalid Credentials" });
 

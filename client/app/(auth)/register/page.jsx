@@ -2,12 +2,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { fetchWithAuth } from "../../utils/api.js"; // ✅ use centralized api.js
 
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,24 +19,22 @@ export default function RegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(form),
-        }
-      );
+      // ✅ Using fetchWithAuth
+      const data = await fetchWithAuth("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
+      // ✅ Save token in localStorage
+      localStorage.setItem("token", data.token);
 
-      router.push("/(auth)/login");
+      setSuccess("Account created successfully! Redirecting...");
+      setTimeout(() => router.push("/dashboard"), 1500);
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -59,8 +59,26 @@ export default function RegisterPage() {
           Join Pro-Task and boost your productivity 🚀
         </p>
 
+        {/* Error Message */}
         {error && (
-          <p className="text-red-400 text-sm mb-4 text-center">{error}</p>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-red-400 text-sm mb-4 text-center"
+          >
+            {error}
+          </motion.p>
+        )}
+
+        {/* Success Message */}
+        {success && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-green-400 text-sm mb-4 text-center"
+          >
+            {success}
+          </motion.p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -122,7 +140,7 @@ export default function RegisterPage() {
         <p className="mt-6 text-center text-gray-400 text-sm">
           Already have an account?{" "}
           <span
-            onClick={() => router.push("/(auth)/login")}
+            onClick={() => router.push("/login")}
             className="text-pink-400 font-semibold cursor-pointer hover:underline"
           >
             Sign in

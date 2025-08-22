@@ -24,29 +24,36 @@ export default function LoginPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include",
+          credentials: "include", // allow cookies if backend sends them
           body: JSON.stringify(form),
         }
       );
 
       const data = await res.json();
+
       if (!res.ok) throw new Error(data.message || "Login failed");
 
-      router.push("/dashboard"); // after login
+      // ✅ Save token in localStorage for future API calls
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      // ✅ Redirect to dashboard
+      router.push("/dashboard");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-purple-950 to-black px-4">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-        className="w-full max-w-md bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-8 md:p-10"
+        transition={{ duration: 0.6 }}
+        className="w-full max-w-md bg-gray-900/80 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl p-8 md:p-10"
       >
         <h2 className="text-3xl font-extrabold text-white text-center mb-2">
           Welcome Back 👋
@@ -60,6 +67,7 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Email
@@ -75,6 +83,7 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Password */}
           <div>
             <label className="block text-sm font-medium text-gray-300">
               Password
@@ -91,6 +100,7 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -103,7 +113,7 @@ export default function LoginPage() {
         <p className="mt-6 text-center text-gray-400 text-sm">
           Don’t have an account?{" "}
           <span
-            onClick={() => router.push("/(auth)/register")}
+            onClick={() => router.push("/register")}
             className="text-purple-400 font-semibold cursor-pointer hover:underline"
           >
             Sign up
