@@ -2,7 +2,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { fetchWithAuth } from "../utils/api"; // ✅ import wrapper
+import { fetchWithAuth } from "../utils/api";
+import ProjectCard from "../components/ProjectCard";
+import TaskCard from "../components/TaskCard";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -65,33 +67,30 @@ export default function DashboardPage() {
         <p className="text-red-400 mb-4 text-center font-medium">{error}</p>
       )}
 
-      {/* Projects */}
+      {/* Projects Section */}
       <motion.section
         initial={{ opacity: 0, x: -40 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
         className="mb-10"
       >
-        <h2 className="text-2xl font-semibold mb-4">📂 Your Projects</h2>
+        <h2 className="text-2xl font-semibold mb-4">📁 Your Projects</h2>
         {projects.length === 0 ? (
           <p className="text-gray-400">No projects yet. Create one!</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {projects.map((project) => (
-              <motion.div
+              <ProjectCard
                 key={project._id}
-                whileHover={{ scale: 1.05 }}
-                className="p-6 rounded-2xl bg-gray-800 border border-gray-700 shadow-lg cursor-pointer hover:border-purple-500 transition"
-              >
-                <h3 className="text-xl font-bold mb-2">{project.name}</h3>
-                <p className="text-gray-400 text-sm">{project.description}</p>
-              </motion.div>
+                project={project}
+                onClick={() => router.push(`/projects/${project._id}`)}
+              />
             ))}
           </div>
         )}
       </motion.section>
 
-      {/* Tasks */}
+      {/* Tasks Section */}
       <motion.section
         initial={{ opacity: 0, x: 40 }}
         animate={{ opacity: 1, x: 0 }}
@@ -101,16 +100,13 @@ export default function DashboardPage() {
         {tasks.length === 0 ? (
           <p className="text-gray-400">No tasks assigned yet.</p>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {tasks.map((task) => (
-              <motion.div
+              <TaskCard
                 key={task._id}
-                whileHover={{ scale: 1.02 }}
-                className="p-4 rounded-xl bg-gray-800 border border-gray-700 shadow-md hover:border-pink-500 transition"
-              >
-                <h3 className="font-semibold">{task.title}</h3>
-                <p className="text-gray-400 text-sm">{task.status}</p>
-              </motion.div>
+                task={task}
+                onClick={() => console.log("Clicked task:", task.title)}
+              />
             ))}
           </div>
         )}
