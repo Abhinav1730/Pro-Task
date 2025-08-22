@@ -1,8 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const fetchWithAuth = async (endpoint, options = {}) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token"); // JWT token stored after login
 
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
@@ -11,7 +11,6 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
         Authorization: token ? `Bearer ${token}` : "",
         ...options.headers,
       },
-      credentials: "include",
     });
 
     const contentType = res.headers.get("content-type");
@@ -25,10 +24,10 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
 
     if (!res.ok) {
       if (res.status === 401) {
+        // Unauthorized, redirect to login
         window.location.href = "/login";
         return;
       }
-      console.error("API error response:", data);
       throw new Error(data?.message || `Error: ${res.status}`);
     }
 

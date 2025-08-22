@@ -16,23 +16,23 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        // fetching projects
+        // Fetching projects
         const projectData = await fetchWithAuth("/api/projects");
-        setProjects(projectData.projects || []);
+        setProjects(Array.isArray(projectData) ? projectData : []);
 
-        // fetching tasks
-        const taskData = await fetchWithAuth("/api/tasks");
-        setTasks(taskData.tasks || []);
+        // Fetching tasks
+        const taskData = await fetchWithAuth("/api/tasks"); // ✅ fixed URL
+        setTasks(Array.isArray(taskData) ? taskData : []);
       } catch (err) {
-        console.error("Dashboard error:", err.message);
-        setError(" Failed to load dashboard data. Please try again.");
+        console.error("Dashboard error:", err.message || err);
+        setError("Failed to load dashboard data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
     loadDashboard();
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (
@@ -105,7 +105,7 @@ export default function DashboardPage() {
               <TaskCard
                 key={task._id}
                 task={task}
-                onClick={() => console.log("Clicked task:", task.title)}
+                onClick={() => router.push(`/tasks/${task._id}`)}
               />
             ))}
           </div>

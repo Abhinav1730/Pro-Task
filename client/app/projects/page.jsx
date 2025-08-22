@@ -14,10 +14,10 @@ export default function ProjectsPage() {
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const data = await fetchWithAuth("/api/projects");
-        setProjects(data.projects || []);
+        const data = await fetchWithAuth("/api/projects"); // ✅ calls Next.js API
+        setProjects(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Projects error:", err.message);
+        console.error("Projects error:", err.message || err);
         setError("Failed to load projects. Please try again.");
       } finally {
         setLoading(false);
@@ -25,7 +25,7 @@ export default function ProjectsPage() {
     };
 
     loadProjects();
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (

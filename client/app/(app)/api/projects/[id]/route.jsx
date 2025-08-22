@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "../../../../../../server/src/config/database.js"
-import Project from "../../../../../../server/src/models///projectModels.js"
+import Project from "../../../../../../server/src/models/projectModels.js"
 
 // GET a single project by ID
 export async function GET(req, { params }) {
