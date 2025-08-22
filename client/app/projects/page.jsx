@@ -3,34 +3,34 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { fetchWithAuth } from "../../utils/api.js";
-import TaskCard from "../../components/TaskCard";
+import ProjectCard from "../../components/ProjectCard";
 
-export default function TasksPage() {
+export default function ProjectsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [tasks, setTasks] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const loadTasks = async () => {
+    const loadProjects = async () => {
       try {
-        const data = await fetchWithAuth("/api/tasks");
-        setTasks(data.tasks || []);
+        const data = await fetchWithAuth("/api/projects");
+        setProjects(data.projects || []);
       } catch (err) {
-        console.error("Tasks error:", err.message);
-        setError("Failed to load tasks. Please try again.");
+        console.error("Projects error:", err.message);
+        setError("Failed to load projects. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadTasks();
+    loadProjects();
   }, [router]);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
-        <p className="animate-pulse text-lg">Loading tasks...</p>
+        <p className="animate-pulse text-lg">Loading projects...</p>
       </div>
     );
   }
@@ -43,7 +43,7 @@ export default function TasksPage() {
         transition={{ duration: 0.7 }}
         className="flex justify-between items-center mb-8"
       >
-        <h1 className="text-3xl md:text-4xl font-bold">✅ Your Tasks</h1>
+        <h1 className="text-3xl md:text-4xl font-bold">📁 Your Projects</h1>
         <button
           onClick={() => {
             localStorage.removeItem("token");
@@ -59,20 +59,20 @@ export default function TasksPage() {
         <p className="text-red-400 mb-4 text-center font-medium">{error}</p>
       )}
 
-      {tasks.length === 0 ? (
-        <p className="text-gray-400 text-center">No tasks assigned yet.</p>
+      {projects.length === 0 ? (
+        <p className="text-gray-400 text-center">No projects yet. Create one!</p>
       ) : (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          {tasks.map((task) => (
-            <TaskCard
-              key={task._id}
-              task={task}
-              onClick={() => console.log("Clicked task:", task.title)}
+          {projects.map((project) => (
+            <ProjectCard
+              key={project._id}
+              project={project}
+              onClick={() => router.push(`/projects/${project._id}`)}
             />
           ))}
         </motion.div>
