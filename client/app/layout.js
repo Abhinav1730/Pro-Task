@@ -1,5 +1,4 @@
 import "./globals.css";
-import Navbar from "./components/Navbar";
 
 export const metadata = {
   title: "Pro-Task",
@@ -9,10 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-black text-white">
-        <Navbar />
-        {children}
-      </body>
+      <body className="min-h-screen bg-black text-white">{children}</body>
     </html>
   );
 }

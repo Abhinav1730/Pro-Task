@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { fetchWithAuth } from "../utils/api";
-import ProjectCard from "../components/ProjectCard";
-import TaskCard from "../components/TaskCard";
+import { fetchWithAuth } from "../../utils/api";
+import ProjectCard from "../../components/ProjectCard";
+import TaskCard from "../../components/TaskCard";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -16,11 +16,11 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        // ---- Fetch Projects ----
+        // fetching projects
         const projectData = await fetchWithAuth("/api/projects");
         setProjects(projectData.projects || []);
 
-        // ---- Fetch Tasks ----
+        // fetching tasks
         const taskData = await fetchWithAuth("/api/tasks");
         setTasks(taskData.tasks || []);
       } catch (err) {
