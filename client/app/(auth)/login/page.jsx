@@ -33,12 +33,12 @@ export default function LoginPage() {
 
       if (!res.ok) throw new Error(data.message || "Login failed");
 
-      // ✅ Save token in localStorage for future API calls
+      // Save token in localStorage for future API calls
       if (data.token) {
         localStorage.setItem("token", data.token);
       }
 
-      // ✅ Redirect to dashboard
+      // Redirect to dashboard
       router.push("/dashboard");
     } catch (err) {
       setError(err.message || "Something went wrong");

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { fetchWithAuth } from "../../utils/api";
+import { fetchWithAuth } from "../../utils/api.js";
 import ProjectCard from "../../components/ProjectCard";
 import TaskCard from "../../components/TaskCard";
 
@@ -25,7 +25,7 @@ export default function DashboardPage() {
         setTasks(taskData.tasks || []);
       } catch (err) {
         console.error("Dashboard error:", err.message);
-        setError("⚠️ Failed to load dashboard data. Please try again.");
+        setError(" Failed to load dashboard data. Please try again.");
       } finally {
         setLoading(false);
       }

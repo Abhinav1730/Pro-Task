@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:4000";
+const API_BASE_URL = process.env.NEXT_API_BASE_URL;
 
 export const fetchWithAuth = async (endpoint, options = {}) => {
   const token = localStorage.getItem("token");
