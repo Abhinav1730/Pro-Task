@@ -1,39 +1,21 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// client/utils/api.js
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
 
-export const fetchWithAuth = async (endpoint, options = {}) => {
-  try {
-    const token = localStorage.getItem("token"); // JWT token stored after login
+export async function fetchWithAuth(path, options = {}) {
+  const res = await fetch(`${BASE}${path}`, {
+    credentials: "include", // send cookies
+    headers: {
+      "content-type": "application/json",
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
 
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : "",
-        ...options.headers,
-      },
-    });
-
-    const contentType = res.headers.get("content-type");
-
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await res.json();
-    } else {
-      data = await res.text();
-    }
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        // Unauthorized, redirect to login
-        window.location.href = "/login";
-        return;
-      }
-      throw new Error(data?.message || `Error: ${res.status}`);
-    }
-
-    return data;
-  } catch (err) {
-    console.error("FetchWithAuth error:", err);
-    throw err;
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error("API error response:", res.status, errText);
+    throw new Error(String(res.status));
   }
-};
+
+  return res.json();
+}
